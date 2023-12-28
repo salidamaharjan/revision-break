@@ -5,20 +5,28 @@ let word = document.querySelector(".guess");
 let leftWord = document.querySelector(".word-num");
 let scoreNum = document.querySelector(".score-num");
 let randomWord;
+let pressedKey = [];
 
 startBtn.addEventListener("click", hangman);
 nextBtn.setAttribute("style", "display: none");
 retryBtn.setAttribute("style", "display: none");
 
 function hangman() {
+  startBtn.setAttribute("style", "display: none");
   displayWord();
-  nextBtn.addEventListener("click", displayWord);
+  scoreNum.textContent = 0;
+  leftWord.textContent = 5;
 }
+
 document.addEventListener("keydown", showCorrectLetter);
+nextBtn.addEventListener("click", displayWord);
+retryBtn.addEventListener("click", hangman);
 
 function showCorrectLetter(e) {
-  console.log(randomWord);
+  // console.log(randomWord);
+  score(e.key);
   if (randomWord.includes(e.key)) {
+    pressedKey.push(e.key);
     // console.log("pressed key: ", e.key);
     randomWord.split("").forEach((element, index) => {
       if (element === e.key) {
@@ -36,10 +44,41 @@ function showCorrectLetter(e) {
     });
   } else {
     alert("Incorrect Letter");
+    score(e.key);
+    wordLeft(e.key);
   }
+  console.log("pressedKeyArr: ", pressedKey);
+}
+
+function score(e) {
+  if (randomWord.includes(e)) {
+    // console.log(scoreNum.textContent);
+    console.log(pressedKey);
+    if (pressedKey.includes(e)) {
+      return scoreNum.textContent;
+    }
+    return (scoreNum.textContent = parseInt(scoreNum.textContent) + 1);
+  }
+  return scoreNum.textContent;
+}
+
+function wordLeft(e) {
+  if (!randomWord.includes(e)) {
+    if (leftWord.textContent > 0) {
+      return (leftWord.textContent = parseInt(leftWord.textContent) - 1);
+    } else {
+      alert("Ran out of attempt");
+      word.setAttribute("style", "display: none");
+      retryBtn.removeAttribute("style");
+    }
+  }
+  return leftWord.textContent;
 }
 
 function displayWord() {
+  nextBtn.setAttribute("style", "display: none");
+  retryBtn.setAttribute("style", "display: none");
+  word.removeAttribute("style");
   const wordList = [
     "patience",
     "diligent",
@@ -47,13 +86,14 @@ function displayWord() {
     "programmer",
     "success",
   ];
+  pressedKey = [];
   randomWord = wordList[randomNum(wordList.length)];
   console.log(randomWord);
   word.textContent = "";
   for (let i = 0; i < randomWord.length; i++) {
     word.textContent += "_";
   }
-  console.log("no of dash: ", word.textContent.length);
+  // console.log("no of dash: ", word.textContent.length);
   return word.textContent;
 }
 
